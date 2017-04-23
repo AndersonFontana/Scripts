@@ -1,0 +1,63 @@
+#! /usr/bin/env python2.7
+# -*- coding: utf-8 -*-
+
+import os, sys, re, getpass, subprocess
+
+class colors:
+	HEADER = '\033[95m'
+	OKBLUE = '\033[94m'
+	OKGREEN = '\033[92m'
+	WARNING = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
+	BOLD = '\033[1m'
+	UNDERLINE = '\033[4m'
+
+def readLine(question, errorMsg, errorColor):
+	try:
+		msg = raw_input(question)
+	except KeyboardInterrupt:
+		print errorColor + errorMsg + colors.ENDC
+		sys.exit(0)
+	return msg
+
+os.system("lsblk")
+
+proc = subprocess.Popen(['lsblk', '-o', 'RM,TYPE,KNAME,SIZE,LABEL'], stdout=subprocess.PIPE)
+result = proc.stdout.read()
+
+tmp = re.findall(r'(?<=\n)\s+1\s+disk\s+(\w+)\s+(\S+)\s+(.+)', result)
+if tmp != []:
+	print colors.OKBLUE + '\nDiscos removíveis disponíveis:' + colors.OKGREEN
+	for a,b,c in tmp:
+		print '\t', a, b, c
+	print colors.ENDC
+
+	disk = readLine("Qual disco deseja formatar? Ex: sdc\nDisco: ", "\n\nOperação Abortada!\n", colors.WARNING)
+
+	disk2format = ''
+	while disk2format == '':
+		for line in tmp:
+			if line[0] == disk:
+				disk2format = line
+		if disk2format == '':
+			disk = readLine("Não encontrado. Por favor digite novamente.\nDisco: ", "\n\nOperação Abortada!\n", colors.WARNING)
+
+	print colors.WARNING + "\nIsso vai apagar TODOS os dados de {}: '{}'".format(disk2format[0], disk2format[2]) + colors.ENDC
+	ans = readLine("Tens certeza? (S/N) ", "\n\nCancelado\n", colors.WARNING)
+
+	if ans == 'S' or ans == 's':
+		unmount = re.findall(r'(?<=\n)\s+1\s+part\s+('+disk2format[0]+'\d)?\s+(\S+)\s+(.+)', result)
+		print "\nDesmontando discos..."
+		for line in unmount:
+			os.system(str("sudo umount /dev/" + line[0]))
+		name = readLine("Novo nome da unidade [Enter para padrão]: ", "\n\nOperação Abortada!\n", colors.WARNING)
+		if name == '':
+			name = getpass.getuser().title()
+		print "Formatando unidade para NTFS..."
+		os.system(str("sudo mkntfs -Q -F -L \"" + name + "\" /dev/" + disk2format[0]))
+		print colors.OKGREEN + "\nOperação terminada, até mais!\n" + colors.ENDC
+	else:
+		print colors.WARNING + "\nOperação Abortada!\n" + colors.ENDC
+else:
+	print colors.WARNING + '\nNenhum disco removível disponível!\n' + colors.ENDC
