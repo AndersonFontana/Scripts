@@ -8,4 +8,4 @@ sudo chmod a+x scriptName
 sudo cp scriptName /usr/local/bin/
 ```
 
-And then type the script name in any directory!
+And then type (on terminal) the script name in any directory!

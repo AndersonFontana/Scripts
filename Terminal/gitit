@@ -16,7 +16,7 @@ if len(sys.argv) > 1:
 
 	if msg == 'S' or msg == 's': 
 		os.system("git add -A")
-		os.system("git commit -am " + commit)
+		os.system("git commit -m '" + commit + "'")
 		os.system("git push -u origin master")
 	else:
 		print "\033[93m\nAborted!\n\033[0m"
