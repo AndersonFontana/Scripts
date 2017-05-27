@@ -1,5 +1,5 @@
 {
-	"shell_cmd": "subl \"${file_path}/in\" \"${file_path}/out\" && subl \"${file}\" && g++ \"${file}\" -o \"${file_path}/exec\" -std=c++11 -Wall && \"${file_path}/exec\" < \"${file_path}/in\" > \"${file_path}/out\"",
+	"shell_cmd": "subl \"${file_path}/in\" \"${file_path}/out\" && subl \"${file}\" && g++ \"${file}\" -o \"${file_path}/exec\" -std=c++11 -Wall && { time \"${file_path}/exec\" < \"${file_path}/in\" > \"${file_path}/out\"; } 2>&1 | grep real",
 	"file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
 	"working_dir": "${file_path}",
 	"selector": "source.c, source.c++"
