@@ -1,0 +1,52 @@
+#! /usr/bin/env python2.7
+# -*- coding: utf-8 -*-
+
+import os, sys
+from subprocess import check_output
+
+lista = {
+	"ALVORADA": "http://redesul.link:8088/Redesul/RSAlvorada/playlist.m3u8",
+	"ATIVA": "http://66.70.177.195:8594/live",
+	"CAIOBA": "http://158.69.35.222:8006/;stream.nsv&type=mp3",
+	"NOVA FM": "http://servidor29.brlogic.com:8028/live",
+}
+
+
+def kill_vlc():
+    try:
+    	pid = check_output(["pidof","vlc"])
+    	os.system("kill " + pid)
+    	return True
+    except Exception as e:
+    	return False
+     
+ok = True
+cmd = ""
+if len(sys.argv) > 1:
+	req = ' '.join(sys.argv[1:]).upper()
+	if req == "EDIT":
+		cmd = "subl /usr/local/bin/radio"
+
+	elif req == "STOP":
+		if kill_vlc():
+			print "\n\tRadio desligada!"
+		else:
+			print "\n\tRadio já está desligada!"
+	elif lista[req]:
+		cmd = "cvlc " + lista[req]
+		kill_vlc()
+	else:
+		ok = False
+else:
+	ok = False
+		
+if ok:
+	# print cmd
+	os.system(cmd)
+else:
+	print "\n\tradio <opção>\n"
+	print "\tOpções disponíveis: (case insensitive)"
+	print "\t\tradio EDIT: Editar lista de radios"
+	print "\t\tradio STOP: Para a radio atual"
+	for radio in lista:
+		print "\t\tradio " + radio
